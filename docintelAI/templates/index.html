@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Ask AI · DocIntel{% endblock %}
+{% block content %}
+<section class="hero-head">
+  <div><div class="eyebrow">DOCUMENT INTELLIGENCE</div><h1>Ask your documents.<br><em>Get grounded answers.</em></h1><p>Search your uploaded PDFs with natural language. DocIntel retrieves relevant passages and explains answers with source references.</p></div>
+  <a class="outline-btn" href="{{ url_for('upload_page') }}"><i data-lucide="plus"></i> Add documents</a>
+</section>
+<div class="stats-row">
+  <div class="stat-card"><span class="stat-icon"><i data-lucide="file-text"></i></span><div><strong>{{ doc_count }}</strong><small>Documents indexed</small></div></div>
+  <div class="stat-card"><span class="stat-icon"><i data-lucide="layers-3"></i></span><div><strong>{{ chunk_count }}</strong><small>Searchable chunks</small></div></div>
+  <div class="stat-card"><span class="stat-icon"><i data-lucide="sparkles"></i></span><div><strong>RAG</strong><small>Answering mode</small></div></div>
+</div>
+
+<section class="assistant-layout">
+  <section class="chat-card">
+    <div class="chat-card-head"><div><span class="live-badge"><span></span> AI READY</span><h2>Document assistant</h2></div><span class="model-pill">Local LLM · {{ model_name }}</span></div>
+    <div id="chat-log" class="chat-log">
+      <div class="welcome-message" id="welcome-message"><div class="ai-avatar"><i data-lucide="sparkles"></i></div><div><h3>What would you like to know?</h3><p>Ask a question about the information inside your indexed documents.</p><div class="suggestions"><button type="button">What is the main purpose of these documents?</button><button type="button">Summarize the key points.</button><button type="button">What important rules are mentioned?</button></div></div></div>
+    </div>
+    <form id="ask-form" class="ask-form"><div class="input-wrap"><i data-lucide="search"></i><input type="text" id="question-input" name="question" placeholder="Ask anything about your documents…" autocomplete="off" required><button type="button" id="clear-input" class="clear-input" aria-label="Clear"><i data-lucide="x"></i></button></div><button type="submit" id="ask-button" class="send-btn">Ask AI <i data-lucide="arrow-up-right"></i></button></form>
+    <div class="chat-foot"><span><i data-lucide="corner-down-right"></i> Answers are grounded in retrieved document context</span><span>Press Enter to ask</span></div>
+  </section>
+  <aside class="sources-panel" id="sources-panel" aria-live="polite">
+    <div class="sources-head"><div><i data-lucide="share-2"></i><strong>Sources</strong> <span id="source-count">(0)</span></div><button id="clear-sources" type="button">Clear</button></div>
+    <div class="sources-body" id="sources-body"><div class="sources-empty"><div class="empty-source-icon"><i data-lucide="file-search"></i></div><h3>Sources appear here</h3><p>Ask a question and DocIntel will show the document pages used to ground the answer.</p></div></div>
+  </aside>
+</section>
+
+<div class="excerpt-modal" id="excerpt-modal" aria-hidden="true"><div class="modal-backdrop" data-close-excerpt></div><div class="excerpt-dialog"><button class="modal-close" data-close-excerpt aria-label="Close"><i data-lucide="x"></i></button><div class="eyebrow">RELEVANT DOCUMENT CONTEXT</div><h2 id="excerpt-title">Source excerpt</h2><div class="excerpt-meta" id="excerpt-meta"></div><div class="excerpt-text" id="excerpt-text"></div></div></div>
+{% endblock %}

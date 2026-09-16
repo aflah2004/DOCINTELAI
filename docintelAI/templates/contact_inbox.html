@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Contact Inbox · DocIntel AI{% endblock %}
+{% block content %}
+<section class="page-head page-head-row"><div><div class="eyebrow">ADMIN · SUPPORT</div><h1>Contact Inbox</h1><p>Customer messages submitted through Contact Us are stored locally here.</p></div><a href="{{ url_for('settings_page') }}" class="outline-btn"><i data-lucide="arrow-left"></i> Settings</a></section>
+{% if messages %}<div class="inbox-list">{% for m in messages %}<article class="message-card {% if m.status == 'new' %}unread{% endif %}"><div class="message-head"><span class="message-status">{{ m.status|upper }}</span><time>{{ m.created_at.replace('T',' ') }} UTC</time><form action="{{ url_for('contact_mark_read', message_id=m.id) }}" method="post"><button class="mini-delete" {% if m.status == 'read' %}disabled{% endif %}>Mark read</button></form></div><h2>{{ m.subject }}</h2><div class="message-from"><strong>{{ m.name }}</strong><span>{{ m.email }}</span></div><p>{{ m.message }}</p></article>{% endfor %}</div>{% else %}<div class="empty-state"><div class="empty-icon"><i data-lucide="inbox"></i></div><h3>No messages yet</h3><p>Customer messages will appear here after they use Contact Us.</p></div>{% endif %}
+{% endblock %}
