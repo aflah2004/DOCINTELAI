@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Verify code' if mode == 'verify' else ('Log in' if mode == 'login' else 'Create account') }} · DocIntel{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card {{ 'verify-card' if mode == 'verify' }}">
+    <div class="auth-logo">
+      <span class="brand-icon"><i data-lucide="sparkles"></i></span>
+      <div><strong>DocIntel</strong><small>AI DOCUMENT INTELLIGENCE</small></div>
+    </div>
+
+    {% if mode == 'signup' or (mode == 'verify' and purpose == 'signup') %}
+    <div class="step-indicator">
+      <div class="step {{ 'active' if mode == 'signup' else 'done' }}">
+        <span class="step-circle">{{ '✓' if mode != 'signup' else '1' }}</span>
+        <span>Account Details</span>
+      </div>
+      <span class="step-line"></span>
+      <div class="step {{ 'active' if mode == 'verify' }}">
+        <span class="step-circle">2</span>
+        <span>Verify Email</span>
+      </div>
+      <span class="step-line"></span>
+      <div class="step">
+        <span class="step-circle">3</span>
+        <span>Welcome</span>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if mode == 'verify' %}
+      <div class="verify-icon"><i data-lucide="mail"></i></div>
+      <h1>Verify your email</h1>
+      <p>We've sent a 6-digit code to <strong>{{ email }}</strong>.<br>Enter it below to continue.</p>
+
+      <form method="post" action="{{ url_for('verify_otp', purpose=purpose) }}" class="auth-form otp-verify-form">
+        <div class="otp-group">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+          <input class="otp-box" type="text" inputmode="numeric" maxlength="1">
+        </div>
+        <input type="hidden" name="otp" value="">
+        <input type="hidden" name="next" value="{{ next or '' }}">
+        <button class="primary-btn full-btn" type="submit">
+          Verify &amp; Continue <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="resend-line">
+        Didn't receive the code?
+        <form method="post" action="{{ url_for('resend_otp_route') }}" style="display:inline">
+          <input type="hidden" name="purpose" value="{{ purpose }}">
+          <button type="submit" data-resend-btn disabled>
+            <span data-resend-label>Resend code (60s)</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="divider-or">OR</div>
+
+      <a class="outline-btn full-btn" href="{{ url_for('login') if purpose == 'login' else url_for('signup') }}">
+        <i data-lucide="arrow-left"></i> Go back
+      </a>
+
+      <small class="auth-note"><i data-lucide="shield-check"></i> For your security, this code will expire in 5 minutes.</small>
+
+    {% else %}
+      <div class="eyebrow">{{ 'WELCOME BACK' if mode == 'login' else 'GET STARTED' }}</div>
+      <h1>{{ 'Sign in to DocIntel' if mode == 'login' else 'Create your account' }}</h1>
+      <p>{{ 'Access your document workspace and continue where you left off.' if mode == 'login' else 'Create an account to upload and manage your private document workspace.' }}</p>
+
+      <form method="post" class="auth-form">
+        {% if mode == 'signup' %}
+        <label>Name<input name="name" required autocomplete="name" placeholder="Your name"></label>
+        {% endif %}
+        <label>Email<input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>
+        <label>Password<input type="password" name="password" required minlength="6" autocomplete="{{ 'current-password' if mode == 'login' else 'new-password' }}" placeholder="At least 6 characters"></label>
+        {% if mode == 'signup' %}
+        <label>Confirm password<input type="password" name="confirm_password" required minlength="6" autocomplete="new-password" placeholder="Repeat your password"></label>
+        {% endif %}
+        <input type="hidden" name="next" value="{{ next or '' }}">
+        <button class="primary-btn full-btn" type="submit">
+          {{ 'Log in' if mode == 'login' else 'Send Verification Code' }} <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="auth-switch">
+        {{ "Don't have an account?" if mode == 'login' else 'Already have an account?' }}
+        <a href="{{ url_for('signup') if mode == 'login' else url_for('login') }}">{{ 'Sign up' if mode == 'login' else 'Log in' }}</a>
+      </div>
+
+      <small class="auth-note"><i data-lucide="shield-check"></i> Local demo authentication with hashed passwords.</small>
+    {% endif %}
+  </div>
+</div>
+
+{% if mode == 'verify' %}
+<script>
+(function () {
+  const form = document.querySelector('.otp-verify-form');
+  if (!form) return;
+
+  const boxes = Array.from(form.querySelectorAll('.otp-box'));
+  const hidden = form.querySelector('input[name="otp"]');
+
+  function updateHidden() {
+    hidden.value = boxes.map(b => b.value).join('');
+  }
+
+  boxes.forEach((box, idx) => {
+    box.addEventListener('input', () => {
+      box.value = box.value.replace(/[^0-9]/g, '').slice(0, 1);
+      box.classList.toggle('filled', box.value.length === 1);
+      if (box.value && idx < boxes.length - 1) {
+        boxes[idx + 1].focus();
+      }
+      updateHidden();
+    });
+
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && idx > 0) {
+        boxes[idx - 1].focus();
+      }
+    });
+
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData)
+        .getData('text')
+        .replace(/[^0-9]/g, '');
+      pasted.split('').forEach((ch, i) => {
+        if (boxes[i]) {
+          boxes[i].value = ch;
+          boxes[i].classList.add('filled');
+        }
+      });
+      const nextIdx = Math.min(pasted.length, boxes.length - 1);
+      boxes[nextIdx].focus();
+      updateHidden();
+    });
+  });
+
+  if (boxes[0]) boxes[0].focus();
+
+  form.addEventListener('submit', updateHidden);
+
+  // Resend cooldown countdown. Matches OTP_RESEND_SECONDS in app.py (60s).
+  // If you change that constant, update the starting value below too.
+  let seconds = 60;
+  const btn = document.querySelector('[data-resend-btn]');
+  const label = document.querySelector('[data-resend-label]');
+
+  function tick() {
+    if (!btn || !label) return;
+    if (seconds <= 0) {
+      btn.disabled = false;
+      label.textContent = 'Resend code';
+      return;
+    }
+    label.textContent = `Resend code (${seconds}s)`;
+    seconds -= 1;
+    setTimeout(tick, 1000);
+  }
+  tick();
+})();
+</script>
+{% endif %}
+{% endblock %}

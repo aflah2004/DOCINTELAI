@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Upload · DocIntel AI{% endblock %}
+{% block content %}
+<section class="page-head"><div><div class="eyebrow">KNOWLEDGE BASE</div><h1>Bring your documents to life.</h1><p>Upload PDFs and DocIntel will extract, chunk, embed and index their content for grounded semantic search.</p></div></section>
+<div class="upload-grid premium-upload">
+  <section class="surface-card upload-main">
+    <div class="upload-card-head"><div><span class="section-kicker"><i data-lucide="lock-keyhole"></i> PRIVATE DOCUMENT PROCESSING</span><h2>Upload your knowledge</h2><p>Drop one or more PDFs here. You can review every selected file before processing.</p></div><span class="pdf-limit">PDF · 25 MB</span></div>
+    <form action="{{ url_for('upload_files') }}" method="post" enctype="multipart/form-data" class="upload-form" id="upload-form">
+      <label for="files" class="dropzone" id="dropzone"><div class="upload-orb"><i data-lucide="cloud-upload"></i></div><h2 id="drop-title">Drop your PDFs here</h2><p id="drop-subtitle">Drag and drop files into this area, or browse your computer.</p><span>PDF only · multiple files supported</span><input type="file" id="files" name="files" accept="application/pdf" multiple hidden></label>
+      <div class="selection-head" id="selection-head" hidden><div><strong id="selection-count">0 files selected</strong><span>Review before indexing</span></div><button type="button" id="clear-files">Clear all</button></div>
+      <div id="file-list" class="file-list"></div>
+      <button type="submit" id="process-button" class="primary-btn full-btn" disabled><i data-lucide="scan-search"></i><span id="process-label">Process documents</span><span class="button-arrow">→</span></button>
+      <div class="upload-progress" id="upload-progress" hidden><div class="progress-track"><span></span></div><small id="progress-label">Processing selected documents…</small></div>
+    </form>
+  </section>
+  <aside class="info-card upload-guide"><div class="info-icon"><i data-lucide="wand-sparkles"></i></div><h3>From file to searchable knowledge</h3><div class="step"><b>01</b><div><strong>Upload</strong><p>Select one or several PDF documents and review the files first.</p></div></div><div class="step"><b>02</b><div><strong>Process</strong><p>DocIntel extracts text and preserves page references.</p></div></div><div class="step"><b>03</b><div><strong>Index</strong><p>Text is chunked and embedded into the local FAISS index.</p></div></div><div class="step"><b>04</b><div><strong>Ask</strong><p>Questions retrieve relevant passages for grounded AI answers.</p></div></div><div class="privacy-callout"><i data-lucide="shield-check"></i><span>Your uploaded PDFs and local index stay on this machine.</span></div></aside>
+</div>
+{% endblock %}
